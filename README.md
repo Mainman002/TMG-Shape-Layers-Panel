@@ -1,8 +1,5 @@
-# TMG-Shape-Layers-Panel
+# TMG-Shape-Layers-Panel (blender 2.8x addon) 
 A blender addon for sculpting with shape keys as layers.
-
-# tmg-mod-tools (blender 2.8x addon) 
-#### Sculpt using blender's shape keys system.
 
 #### current version is supported for Blender 2.83
 
