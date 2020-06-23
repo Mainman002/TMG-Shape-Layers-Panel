@@ -77,14 +77,14 @@ class Sculpt_Shape_Layers_Panel(bpy.types.Panel):
 									text='',
 									icon='RESTRICT_RENDER_OFF')
 
-				row.operator('mesh.sculpt_ot_keyframe_shape_keys',
-									text='',
-									icon='KEYINGSET')
+				# row.operator('mesh.sculpt_ot_keyframe_shape_keys',
+				# 					text='',
+				# 					icon='KEYINGSET')
 
-				row.operator('mesh.sculpt_ot_clear_all_keyframes',
-									text='',
-									icon='KEYFRAME',
-									)
+				# row.operator('mesh.sculpt_ot_clear_all_keyframes',
+				# 					text='',
+				# 					icon='KEYFRAME',
+				# 					)
 
 				row.operator('mesh.sculpt_ot_merge_shape_keys',
 									text='',
@@ -102,7 +102,7 @@ class Sculpt_Shape_Layers_Panel(bpy.types.Panel):
 				lay = panel.row(align=True)
 				row = col_3.row(align=True)
 
-				row.prop(addon_prefs, "Sculpt_Keyframe_Timeline", text="", icon='KEY_HLT')
+				# row.prop(addon_prefs, "Sculpt_Keyframe_Timeline", text="", icon='KEY_HLT')
 				row.operator('mesh.sculpt_ot_show_tmg_addon_prefs', text='', icon='TOOL_SETTINGS')
 
 				
@@ -123,7 +123,7 @@ class Sculpt_Shape_Layers_Panel(bpy.types.Panel):
 				lay = panel.row(align=True)
 				row = col_3.row(align=True)
 
-				row.prop(addon_prefs, "Sculpt_Keyframe_Timeline", text="", icon='KEY_HLT')
+				# row.prop(addon_prefs, "Sculpt_Keyframe_Timeline", text="", icon='KEY_HLT')
 				row.operator('mesh.sculpt_ot_show_tmg_addon_prefs', text='', icon='TOOL_SETTINGS')
 
 
@@ -137,7 +137,7 @@ class Sculpt_Shape_Layers_Panel(bpy.types.Panel):
 			col_3 = lay.row()
 
 			row = col_3.row(align=True)
-			row.prop(addon_prefs, "Sculpt_Keyframe_Timeline", text="Keyframe", icon='KEY_HLT')
+			# row.prop(addon_prefs, "Sculpt_Keyframe_Timeline", text="Keyframe", icon='KEY_HLT')
 			
 			row.operator('mesh.sculpt_ot_show_tmg_addon_prefs',
 								text='Preferences',
@@ -154,14 +154,14 @@ class Sculpt_Shape_Layers_Panel(bpy.types.Panel):
 									text='Toggle Other Layers',
 									icon='RESTRICT_RENDER_OFF')
 
-				row.operator('mesh.sculpt_ot_keyframe_shape_keys',
-									text='Keyframe Layers',
-									icon='KEYINGSET')
+				# row.operator('mesh.sculpt_ot_keyframe_shape_keys',
+				# 					text='Keyframe Layers',
+				# 					icon='KEYINGSET')
 
-				row.operator('mesh.sculpt_ot_clear_all_keyframes',
-									text='Clear All Keyframes',
-									icon='KEYFRAME',
-									)
+				# row.operator('mesh.sculpt_ot_clear_all_keyframes',
+				# 					text='Clear All Keyframes',
+				# 					icon='KEYFRAME',
+				# 					)
 
 				row.operator('mesh.sculpt_ot_merge_shape_keys',
 									text='Merge Layers',
@@ -329,44 +329,60 @@ class Sculpt_OT_ADD_New_Shape_Layer(bpy.types.Operator):
 
 	def execute(self, context):
 
-		preferences = context.preferences
-		addon_prefs = preferences.addons['tmg-shape-layers-panel'].preferences
+		# preferences = context.preferences
+		# addon_prefs = preferences.addons['tmg-shape-layers-panel'].preferences
 
-		keyframe_timeline = context.preferences.addons['tmg-shape-layers-panel'].preferences.Sculpt_Keyframe_Timeline
-
-		keys = 0
 		ob = bpy.context.active_object
-		current_frame = bpy.context.active_object.active_shape_key_index
+		key = ob.data.shape_keys
+		kb = ob.active_shape_key
 
-		# Adds Layer with timeline keyframe
-		if keyframe_timeline:
-			bpy.ops.object.shape_key_add(from_mix=False)
-			current_frame = bpy.context.active_object.active_shape_key_index
-			keys = ob.data.shape_keys.key_blocks.keys()
+		# current_frame = bpy.context.active_object.active_shape_key_index
+		keyframe_timeline = context.scene.keyframe_timeline
 
-			for shape in ob.data.shape_keys.key_blocks:
-				if (current_frame == 0):
-					shape.name = 'Base Shape'
-					shape.keyframe_insert("value", frame=0)
-				elif (shape.name == ob.active_shape_key.name):
-					shape.name = "Layer " + str(current_frame)
-					shape.value = 1.0
-					shape.keyframe_insert(
-						"value", frame=ob.active_shape_key_index)
-					bpy.data.scenes['Scene'].frame_current = ob.active_shape_key_index
+		# frames_id = []
 
-		# Adds Layer without timeline keyframe
+		# bpy.ops.object.shape_key_add(from_mix=False)
+		# keys = ob.data.shape_keys.key_blocks.keys()
+
+		# key = bpy.data.shape_keys["Key"]
+
+		# panel_layers = bpy.data.shape_keys["Key"].key_blocks
+
+		# for shape in ob.data.shape_keys.key_blocks:
+		# 	for fr in range(0, len(panel_layers)-1):
+		# 		if fr == 0:
+		# 			shape.name = 'Base Shape'
+		# 		elif shape.name == ob.active_shape_key.name:
+		# 			shape.name = "Layer " + str(len(panel_layers)-1)
+		# 			shape.value = 1.0
+
+
+
+		# for shape in ob.data.shape_keys.key_blocks:
+		# 	if shape.name == ob.active_shape_key.name:
+		# 		shape.name = "Applied Shape"
+		# 		shape.value = 1.0
+		# 		shape.keyframe_insert("value", frame=ob.active_shape_key_index)
+		# 	else:
+		# 		shape_list.append(shape)
+
+
+
+		bpy.ops.object.shape_key_add(from_mix=False)
+		keys = ob.data.shape_keys.key_blocks.keys()
+
+		current_frame =  len(bpy.data.shape_keys["Key"].key_blocks)
+		active_frame = bpy.context.active_object.active_shape_key_index
+
+		if current_frame == 0:
+			shape.name = 'Base Shape'
 		else:
-			bpy.ops.object.shape_key_add(from_mix=False)
-			current_frame = bpy.context.active_object.active_shape_key_index
-			keys = ob.data.shape_keys.key_blocks.keys()
 
 			for shape in ob.data.shape_keys.key_blocks:
-				if (current_frame == 0):
-					shape.name = 'Base Shape'
-				elif (shape.name == ob.active_shape_key.name):
-					shape.name = "Layer " + str(current_frame)
-					shape.value = 1.0
+				for fr in range(0, current_frame-1):
+					if shape.name == ob.active_shape_key.name:
+						shape.name = "Layer " + str(fr)
+						shape.value = 1.0
 
 		return {'FINISHED'}
 
@@ -434,31 +450,31 @@ class Sculpt_OT_Merge_Shape_Keys(bpy.types.Operator):
 		return {'FINISHED'}
 
 
-class Sculpt_OT_Keyframe_Shape_Keys(bpy.types.Operator):
-	"""Set all shape layer's value on current frame"""
-	bl_idname = 'mesh.sculpt_ot_keyframe_shape_keys'
-	bl_label = 'Keyframe Layers'
-	bl_description = 'Set all shape layers value to current keyframe.'
-	bl_options = {'REGISTER'}
+# class Sculpt_OT_Keyframe_Shape_Keys(bpy.types.Operator):
+# 	"""Set all shape layer's value on current frame"""
+# 	bl_idname = 'mesh.sculpt_ot_keyframe_shape_keys'
+# 	bl_label = 'Keyframe Layers'
+# 	bl_description = 'Set all shape layers value to current keyframe.'
+# 	bl_options = {'REGISTER'}
 
-	@ classmethod
-	def poll(cls, context):
-		return context.area.type == 'VIEW_3D'
+# 	@ classmethod
+# 	def poll(cls, context):
+# 		return context.area.type == 'VIEW_3D'
 
-	def execute(self, context):
+# 	def execute(self, context):
 
-		shape_list = []
-		keys = 0
-		ob = bpy.context.active_object
-		current_frame = bpy.context.active_object.active_shape_key_index
-		keys = ob.data.shape_keys.key_blocks.keys()
+# 		shape_list = []
+# 		keys = 0
+# 		ob = bpy.context.active_object
+# 		current_frame = bpy.context.active_object.active_shape_key_index
+# 		keys = ob.data.shape_keys.key_blocks.keys()
 
-		for shape in ob.data.shape_keys.key_blocks:
-			shape.keyframe_insert(
-				"value", frame=bpy.data.scenes['Scene'].frame_current)
-			bpy.data.scenes['Scene'].frame_current = bpy.data.scenes['Scene'].frame_current
+# 		for shape in ob.data.shape_keys.key_blocks:
+# 			shape.keyframe_insert(
+# 				"value", frame=bpy.data.scenes['Scene'].frame_current)
+# 			bpy.data.scenes['Scene'].frame_current = bpy.data.scenes['Scene'].frame_current
 
-		return {'FINISHED'}
+# 		return {'FINISHED'}
 
 
 
@@ -479,31 +495,10 @@ class Sculpt_OT_Remove_Selected_Layer(bpy.types.Operator):
 		key = ob.data.shape_keys
 		kb = ob.active_shape_key
 
-		all_keys = []
-
-		current_frame = bpy.context.active_object.active_shape_key_index
-
-		s = bpy.data.scenes['Scene']
-
-		if ob.data.shape_keys:
-			for shape in ob.data.shape_keys.key_blocks:
-				try:
-					shape.keyframe_delete("value", index=-1, frame=current_frame, group="")
-
-				except RuntimeError:
-					break
-			bpy.ops.object.shape_key_remove(all=False)
-
-
 		frames_id = []
 
-		for action in bpy.data.actions:
-			for fcurve in action.fcurves:
-				for point in fcurve.keyframe_points:
-					frames_id.append(point)
-
-			for fr in range(current_frame, len(frames_id)):
-				frames_id[fr].co.x -= 1
+		if ob.data.shape_keys:
+			bpy.ops.object.shape_key_remove(all=False)
 
 		return {'FINISHED'}
 
@@ -527,7 +522,6 @@ class Sculpt_OT_Clear_All_Keyframes(bpy.types.Operator):
 		s = bpy.data.scenes['Scene']
 
 		for fr in range(0, len(keys)):
-			s.frame_current = fr
 			for shape in ob.data.shape_keys.key_blocks:
 				if bpy.data.actions:
 					try:
@@ -535,8 +529,6 @@ class Sculpt_OT_Clear_All_Keyframes(bpy.types.Operator):
 							"value", index=-1, frame=fr, group="")
 					except RuntimeError:
 						break
-
-		bpy.data.scenes['Scene'].frame_current = 0
 
 		return {'FINISHED'}
 
@@ -557,14 +549,7 @@ class Sculpt_OT_Apply_Shape_Keys(bpy.types.Operator):
 		shape_list = []
 		keys = 0
 		ob = bpy.context.active_object
-		current_frame = bpy.context.active_object.active_shape_key_index
 		keys = ob.data.shape_keys.key_blocks.keys()
-
-		# Apply all layers to shape
-		for shape in ob.data.shape_keys.key_blocks:
-			shape.keyframe_insert(
-				"value", frame=bpy.data.scenes['Scene'].frame_current)
-			bpy.data.scenes['Scene'].frame_current = bpy.data.scenes['Scene'].frame_current
 
 		bpy.ops.object.shape_key_add(from_mix=True)
 
@@ -573,7 +558,6 @@ class Sculpt_OT_Apply_Shape_Keys(bpy.types.Operator):
 				shape.name = "Applied Shape"
 				shape.value = 1.0
 				shape.keyframe_insert("value", frame=ob.active_shape_key_index)
-				bpy.data.scenes['Scene'].frame_current = ob.active_shape_key_index
 			else:
 				shape_list.append(shape)
 
@@ -586,7 +570,6 @@ class Sculpt_OT_Apply_Shape_Keys(bpy.types.Operator):
 			bpy.ops.object.shape_key_remove()
 
 		bpy.ops.object.shape_key_remove()
-		bpy.data.scenes['Scene'].frame_current = 0
 
 		# Edit Mode
 		bpy.ops.object.editmode_toggle()
@@ -595,4 +578,8 @@ class Sculpt_OT_Apply_Shape_Keys(bpy.types.Operator):
 		bpy.ops.sculpt.sculptmode_toggle()
 
 		return {'FINISHED'}
+
+
+
+
 
