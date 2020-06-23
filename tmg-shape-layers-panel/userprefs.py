@@ -32,7 +32,7 @@ class TMG_User_Preferences(AddonPreferences):
 
     def draw(self, context):
         self.layout.prop(self, "Sculpt_Button_Mode")
-        self.layout.prop(self, "Sculpt_Keyframe_Timeline")
+        # self.layout.prop(self, "Sculpt_Keyframe_Timeline")
         self.layout.prop(self, "shape_settings_menu")
 
 

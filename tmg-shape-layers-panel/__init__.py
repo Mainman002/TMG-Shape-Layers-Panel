@@ -58,7 +58,7 @@ classes = (
     Sculpt_OT_ADD_New_Shape_Layer,
     Sculpt_OT_Remove_Selected_Layer,
     Sculpt_OT_Shape_Key_Hide_Others,
-    Sculpt_OT_Keyframe_Shape_Keys,
+    # Sculpt_OT_Keyframe_Shape_Keys,
     Sculpt_OT_Clear_All_Keyframes,
     Sculpt_OT_Merge_Shape_Keys,
     Sculpt_OT_Apply_Shape_Keys,
