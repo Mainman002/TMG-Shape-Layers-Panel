@@ -334,26 +334,24 @@ class Sculpt_OT_ADD_New_Shape_Layer(bpy.types.Operator):
 		# addon_prefs = preferences.addons['tmg-shape-layers-panel'].preferences
 
 		ob = bpy.context.active_object
-		key = ob.data.shape_keys
-		kb = ob.active_shape_key
+		ob_data = bpy.context.active_object.data
 		keyframe_timeline = context.scene.keyframe_timeline
 
 		#### Add shape key
 		bpy.ops.object.shape_key_add(from_mix=False)
-		keys = ob.data.shape_keys.key_blocks.keys()
 
 		#### Set active keyframe layer
-		current_frame =  len(bpy.data.shape_keys["Key"].key_blocks)
+						# list(ob_data.shape_keys.key_blocks)[1].name
+		current_frame =  len(ob_data.shape_keys.key_blocks)
 		active_frame = bpy.context.active_object.active_shape_key_index
 
 		if current_frame == 0:
 			shape.name = 'Base Shape'
 		else:
-
-			for shape in ob.data.shape_keys.key_blocks:
+			for shape in list(ob_data.shape_keys.key_blocks):
 				for fr in range(0, current_frame-1):
 					if shape.name == ob.active_shape_key.name:
-						shape.name = "Layer " + str(fr)
+						shape.name = "Layer " + str(fr+1)
 						shape.value = 1.0
 
 		return {'FINISHED'}
