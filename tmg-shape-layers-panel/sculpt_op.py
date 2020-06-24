@@ -333,31 +333,33 @@ class Sculpt_OT_ADD_New_Shape_Layer(bpy.types.Operator):
 		# preferences = context.preferences
 		# addon_prefs = preferences.addons['tmg-shape-layers-panel'].preferences
 
+		#### Update undo step
 		bpy.ops.ed.undo_push()
 
 		ob = bpy.context.active_object
+
+		#### Add shape key
+		bpy.ops.object.shape_key_add(from_mix=False)
+		keys = ob.data.shape_keys.key_blocks
+
 		key = ob.data.shape_keys
 		kb = ob.active_shape_key
 		keyframe_timeline = context.scene.keyframe_timeline
 
-		#### Add shape key
-		bpy.ops.object.shape_key_add(from_mix=False)
-		keys = ob.data.shape_keys.key_blocks.keys()
-
 		#### Set active keyframe layer
-		current_frame =  len(bpy.data.shape_keys["Key"].key_blocks)
-		active_frame = bpy.context.active_object.active_shape_key_index
+		current_frame =  len(keys)
 
 		if current_frame == 0:
 			shape.name = 'Base Shape'
 		else:
-
-			for shape in ob.data.shape_keys.key_blocks:
+			for shape in keys:
 				for fr in range(0, current_frame-1):
-					if shape.name == ob.active_shape_key.name:
-						shape.name = "Layer " + str(fr)
+					# print('test name: % s ' % shape)
+					if shape.name == kb.name:
+						shape.name = "Layer " + str(fr+1)
 						shape.value = 1.0
 
+		#### Update undo step
 		bpy.ops.ed.undo_push()
 
 		return {'FINISHED'}
@@ -375,6 +377,7 @@ class Sculpt_OT_Shape_Key_Hide_Others(bpy.types.Operator):
 
 	def execute(self, context):
 
+		#### Update undo step
 		bpy.ops.ed.undo_push()
 
 		ob = bpy.context.active_object
@@ -387,6 +390,7 @@ class Sculpt_OT_Shape_Key_Hide_Others(bpy.types.Operator):
 			sculpt_single_shape_layer = True
 			context.scene.sculpt_single_shape_layer = True
 
+		#### Update undo step
 		bpy.ops.ed.undo_push()
 
 		return {'FINISHED'}
@@ -405,6 +409,7 @@ class Sculpt_OT_Merge_Shape_Keys(bpy.types.Operator):
 
 	def execute(self, context):
 
+		#### Update undo step
 		bpy.ops.ed.undo_push()
 
 		keys = 0
@@ -429,6 +434,7 @@ class Sculpt_OT_Merge_Shape_Keys(bpy.types.Operator):
 						"value", frame=ob.active_shape_key_index)
 					bpy.data.scenes['Scene'].frame_current = ob.active_shape_key_index
 		
+		#### Update undo step
 		bpy.ops.ed.undo_push()
 
 		return {'FINISHED'}
@@ -475,6 +481,7 @@ class Sculpt_OT_Remove_Selected_Layer(bpy.types.Operator):
 
 	def execute(self, context):
 
+		#### Update undo step
 		bpy.ops.ed.undo_push()
 
 		ob = bpy.context.active_object
@@ -486,6 +493,7 @@ class Sculpt_OT_Remove_Selected_Layer(bpy.types.Operator):
 		if ob.data.shape_keys:
 			bpy.ops.object.shape_key_remove(all=False)
 
+		#### Update undo step
 		bpy.ops.ed.undo_push()
 
 		return {'FINISHED'}
@@ -504,6 +512,7 @@ class Sculpt_OT_Clear_All_Keyframes(bpy.types.Operator):
 
 	def execute(self, context):
 
+		#### Update undo step
 		bpy.ops.ed.undo_push()
 
 		ob = bpy.context.active_object
@@ -520,6 +529,7 @@ class Sculpt_OT_Clear_All_Keyframes(bpy.types.Operator):
 					except RuntimeError:
 						break
 
+		#### Update undo step
 		bpy.ops.ed.undo_push()
 
 		return {'FINISHED'}
@@ -538,6 +548,7 @@ class Sculpt_OT_Apply_Shape_Keys(bpy.types.Operator):
 
 	def execute(self, context):
 
+		#### Update undo step
 		bpy.ops.ed.undo_push()
 
 		shape_list = []
@@ -571,6 +582,7 @@ class Sculpt_OT_Apply_Shape_Keys(bpy.types.Operator):
 		# Object Mode
 		bpy.ops.sculpt.sculptmode_toggle()
 
+		#### Update undo step
 		bpy.ops.ed.undo_push()
 
 		return {'FINISHED'}
