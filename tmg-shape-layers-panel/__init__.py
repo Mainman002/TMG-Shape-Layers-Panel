@@ -62,6 +62,8 @@ classes = (
     Sculpt_OT_Clear_All_Keyframes,
     Sculpt_OT_Merge_Shape_Keys,
     Sculpt_OT_Apply_Shape_Keys,
+
+    MESH_UL_custom_shape_keys,
 )
 
 

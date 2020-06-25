@@ -1,18 +1,52 @@
 import bpy
+from bpy.types import Menu, Panel, UIList
+from rna_prop_ui import PropertyPanel
 
 ##################### Update Sculpt Hide Other Shape Layers #############################
 def sculpt_single_shape_layer_changed(self, context):
 	sculpt_single_shape_layer = context.scene.sculpt_single_shape_layer
 
-	ob = bpy.context.active_object
+	ob = context.active_object
 
-	current_frame = bpy.context.active_object.active_shape_key_index
+	current_frame = context.active_object.active_shape_key_index
 	keys = ob.data.shape_keys.key_blocks.keys()
+
 	for shape in ob.data.shape_keys.key_blocks:
 		if shape.name == ob.active_shape_key.name or shape.name == 'Base Shape':
 			shape.mute = False
 		else:
 			shape.mute = sculpt_single_shape_layer
+
+
+
+
+class MESH_UL_custom_shape_keys(UIList):
+	def draw_item(self, _context, layout, _data, item, icon, active_data, _active_propname, index, _hide_all):
+		# assert(isinstance(item, bpy.types.ShapeKey))
+		obj = active_data
+		# key = data
+		key_block = item
+		if self.layout_type in {'DEFAULT', 'COMPACT'}:
+			split = layout.split(factor=0.50, align=False)
+			split.prop(key_block, "name", text="", emboss=False, icon_value=icon)
+			row = split.row(align=True)
+			if key_block.mute or (obj.mode == 'EDIT' and not (obj.use_shape_key_edit_mode and obj.type == 'MESH')):
+				row.active = False
+			if not item.id_data.use_relative:
+				row.prop(key_block, "frame", text="", emboss=False)
+			elif index > 0:
+				row.prop(key_block, "value", text="", emboss=False)
+				row.prop(key_block, "mute", text="", emboss=False)
+			else:
+				row.label(text="")
+			# row.prop(key_block, "mute", text="", emboss=False)
+			props = row.operator('mesh.sculpt_ot_shape_key_hide_others', text='', icon='RESTRICT_RENDER_OFF', emboss=False)
+			props.id = index
+		elif self.layout_type == 'GRID':
+			layout.alignment = 'CENTER'
+			layout.label(text="", icon_value=icon)
+
+
 
 
 class Sculpt_Shape_Layers_Panel(bpy.types.Panel):
@@ -27,7 +61,7 @@ class Sculpt_Shape_Layers_Panel(bpy.types.Panel):
 	@classmethod
 	def poll(cls, context):
 		engine = context.engine
-		obj = context.object
+		obj = context.active_object
 		return (obj and obj.type in {'MESH', 'LATTICE', 'CURVE', 'SURFACE'} and (engine in cls.COMPAT_ENGINES))
 
 	def draw(self, context):
@@ -45,14 +79,14 @@ class Sculpt_Shape_Layers_Panel(bpy.types.Panel):
 
 		layout = self.layout
 
-		ob = bpy.context.active_object
+		ob = context.active_object
 		key = ob.data.shape_keys
 		kb = ob.active_shape_key
 
 		all_keys = []
 
 		if ob.data.shape_keys:
-			for _i in bpy.context.active_object.data.shape_keys.key_blocks.keys():
+			for _i in ob.data.shape_keys.key_blocks.keys():
 				all_keys.append(_i)
 		
 		keys_total = len(all_keys)
@@ -73,9 +107,9 @@ class Sculpt_Shape_Layers_Panel(bpy.types.Panel):
 				# Button Group 3
 				row = col_1.row(align=True)
 
-				row.operator('mesh.sculpt_ot_shape_key_hide_others',
-									text='',
-									icon='RESTRICT_RENDER_OFF')
+				# row.operator('mesh.sculpt_ot_shape_key_hide_others',
+				# 					text='',
+				# 					icon='RESTRICT_RENDER_OFF')
 
 				# row.operator('mesh.sculpt_ot_keyframe_shape_keys',
 				# 					text='',
@@ -136,11 +170,16 @@ class Sculpt_Shape_Layers_Panel(bpy.types.Panel):
 			col_2 = lay.row()
 			col_3 = lay.row()
 
+
+			row = col_1.row(align=True)
+			row.label(text=' ')
+
 			row = col_3.row(align=True)
 			# row.prop(addon_prefs, "Sculpt_Keyframe_Timeline", text="Keyframe", icon='KEY_HLT')
 			
+			row.label(text='Preferences')
 			row.operator('mesh.sculpt_ot_show_tmg_addon_prefs',
-								text='Preferences',
+								text='',
 								icon='TOOL_SETTINGS')
 
 			if keys_total > 0:
@@ -150,9 +189,9 @@ class Sculpt_Shape_Layers_Panel(bpy.types.Panel):
 
 				row = panel.column(align=True)
 
-				row.operator('mesh.sculpt_ot_shape_key_hide_others',
-									text='Toggle Other Layers',
-									icon='RESTRICT_RENDER_OFF')
+				# row.operator('mesh.sculpt_ot_shape_key_hide_others',
+				# 					text='Toggle Other Layers',
+				# 					icon='RESTRICT_RENDER_OFF')
 
 				# row.operator('mesh.sculpt_ot_keyframe_shape_keys',
 				# 					text='Keyframe Layers',
@@ -190,8 +229,7 @@ class Sculpt_Shape_Layers_Panel(bpy.types.Panel):
 		if kb:
 			rows = 6
 
-		row.template_list("MESH_UL_shape_keys", "", key,
-						  "key_blocks", ob, "active_shape_key_index", rows=rows)
+		row.template_list("MESH_UL_custom_shape_keys", "", key, "key_blocks", ob, "active_shape_key_index", rows=rows)
 
 		col = row.column(align=True)
 
@@ -321,11 +359,11 @@ class Sculpt_OT_ADD_New_Shape_Layer(bpy.types.Operator):
 	bl_idname = 'mesh.sculpt_ot_add_new_shape_layer'
 	bl_label = 'New Layer'
 	bl_description = 'Add a new shape layer.'
-	bl_options = {'REGISTER'}
+	# bl_options = {'REGISTER', 'UNDO'}
 
-	@classmethod
-	def poll(cls, context):
-		return context.area.type == 'VIEW_3D'
+	# @classmethod
+	# def poll(cls, context):
+	# 	return context.area.type == 'VIEW_3D'
 
 	def execute(self, context):
 
@@ -336,7 +374,7 @@ class Sculpt_OT_ADD_New_Shape_Layer(bpy.types.Operator):
 		#### Update undo step
 		bpy.ops.ed.undo_push()
 
-		ob = bpy.context.active_object
+		ob = context.active_object
 
 		#### Add shape key
 		bpy.ops.object.shape_key_add(from_mix=False)
@@ -369,19 +407,31 @@ class Sculpt_OT_Shape_Key_Hide_Others(bpy.types.Operator):
 	bl_idname = 'mesh.sculpt_ot_shape_key_hide_others'
 	bl_label = 'View Selected Layer Only'
 	bl_description = 'Only view selected shape layer.'
-	bl_options = {'REGISTER'}
+	# bl_options = {'REGISTER', 'UNDO'}
 
-	@classmethod
-	def poll(cls, context):
-		return context.area.type == 'VIEW_3D'
+	# @classmethod
+	# def poll(cls, context):
+	# 	return context.area.type == 'VIEW_3D'
+
+	id: bpy.props.IntProperty(
+	name="Layer ID",
+	description="The layers id number.",
+	default=0,
+	min=0,
+	)
+
+	toggle: bpy.props.BoolProperty(
+	name="Visibility Toggle",
+	description="Toggles all layer visibility when False.",
+	default=True,
+	)
 
 	def execute(self, context):
 
 		#### Update undo step
 		bpy.ops.ed.undo_push()
 
-		ob = bpy.context.active_object
-		sculpt_single_shape_layer = context.scene.sculpt_single_shape_layer
+		context.active_object.active_shape_key_index = self.id
 
 		if context.scene.sculpt_single_shape_layer == True:
 			sculpt_single_shape_layer = False
@@ -401,11 +451,11 @@ class Sculpt_OT_Merge_Shape_Keys(bpy.types.Operator):
 	bl_idname = 'mesh.sculpt_ot_merge_shape_keys'
 	bl_label = 'Merge Visible'
 	bl_description = 'Merge visible shape layers to a new layer.'
-	bl_options = {'REGISTER'}
+	# bl_options = {'REGISTER', 'UNDO'}
 
-	@ classmethod
-	def poll(cls, context):
-		return context.area.type == 'VIEW_3D'
+	# @ classmethod
+	# def poll(cls, context):
+	# 	return context.area.type == 'VIEW_3D'
 
 	def execute(self, context):
 
@@ -413,15 +463,15 @@ class Sculpt_OT_Merge_Shape_Keys(bpy.types.Operator):
 		bpy.ops.ed.undo_push()
 
 		keys = 0
-		ob = bpy.context.active_object
-		current_frame = bpy.context.active_object.active_shape_key_index
-		keyframe_timeline = context.scene.keyframe_timeline
+		ob = context.active_object
+		current_frame = context.active_object.active_shape_key_index
+		# keyframe_timeline = context.scene.keyframe_timeline
 
-		for shape in ob.data.shape_keys.key_blocks:
-			if keyframe_timeline:
-				shape.keyframe_insert(
-					"value", frame=bpy.data.scenes['Scene'].frame_current)
-				bpy.data.scenes['Scene'].frame_current = bpy.data.scenes['Scene'].frame_current
+		# for shape in ob.data.shape_keys.key_blocks:
+		# 	if keyframe_timeline:
+		# 		shape.keyframe_insert(
+		# 			"value", frame=bpy.data.scenes['Scene'].frame_current)
+		# 		bpy.data.scenes['Scene'].frame_current = bpy.data.scenes['Scene'].frame_current
 
 		bpy.ops.object.shape_key_add(from_mix=True)
 
@@ -429,10 +479,10 @@ class Sculpt_OT_Merge_Shape_Keys(bpy.types.Operator):
 			if shape.name == ob.active_shape_key.name:
 				shape.name = "Applied Shape " + str(current_frame)
 				shape.value = 0.0
-				if keyframe_timeline:
-					shape.keyframe_insert(
-						"value", frame=ob.active_shape_key_index)
-					bpy.data.scenes['Scene'].frame_current = ob.active_shape_key_index
+				# if keyframe_timeline:
+				# 	shape.keyframe_insert(
+				# 		"value", frame=ob.active_shape_key_index)
+				# 	bpy.data.scenes['Scene'].frame_current = ob.active_shape_key_index
 		
 		#### Update undo step
 		bpy.ops.ed.undo_push()
@@ -473,18 +523,18 @@ class Sculpt_OT_Remove_Selected_Layer(bpy.types.Operator):
 	bl_idname = 'mesh.sculpt_ot_remove_selected_layer'
 	bl_label = 'Remove Selected layer'
 	bl_description = 'Remove selected layer and clears keyframe from timeline.'
-	bl_options = {'REGISTER'}
+	# bl_options = {'REGISTER', 'UNDO'}
 
-	@ classmethod
-	def poll(cls, context):
-		return context.area.type == 'VIEW_3D'
+	# @ classmethod
+	# def poll(cls, context):
+	# 	return context.area.type == 'VIEW_3D'
 
 	def execute(self, context):
 
 		#### Update undo step
 		bpy.ops.ed.undo_push()
 
-		ob = bpy.context.active_object
+		ob = context.active_object
 		key = ob.data.shape_keys
 		kb = ob.active_shape_key
 
@@ -504,18 +554,18 @@ class Sculpt_OT_Clear_All_Keyframes(bpy.types.Operator):
 	bl_idname = 'mesh.sculpt_ot_clear_all_keyframes'
 	bl_label = 'Clear All Keyframes'
 	bl_description = 'Clears all keyframes from timeline.'
-	bl_options = {'REGISTER'}
+	# bl_options = {'REGISTER', 'UNDO'}
 
-	@ classmethod
-	def poll(cls, context):
-		return context.area.type == 'VIEW_3D'
+	# @ classmethod
+	# def poll(cls, context):
+	# 	return context.area.type == 'VIEW_3D'
 
 	def execute(self, context):
 
 		#### Update undo step
 		bpy.ops.ed.undo_push()
 
-		ob = bpy.context.active_object
+		ob = context.active_object
 		keys = ob.data.shape_keys.key_blocks.keys()
 
 		s = bpy.data.scenes['Scene']
@@ -540,11 +590,11 @@ class Sculpt_OT_Apply_Shape_Keys(bpy.types.Operator):
 	bl_idname = 'mesh.sculpt_ot_apply_shape_keys'
 	bl_label = 'Apply Layers'
 	bl_description = 'Merges all layers then removes all shape keys from the selected object.'
-	bl_options = {'REGISTER'}
+	# bl_options = {'REGISTER', 'UNDO'}
 
-	@ classmethod
-	def poll(cls, context):
-		return context.area.type == 'VIEW_3D'
+	# @ classmethod
+	# def poll(cls, context):
+	# 	return context.area.type == 'VIEW_3D'
 
 	def execute(self, context):
 
@@ -553,7 +603,7 @@ class Sculpt_OT_Apply_Shape_Keys(bpy.types.Operator):
 
 		shape_list = []
 		keys = 0
-		ob = bpy.context.active_object
+		ob = context.active_object
 		keys = ob.data.shape_keys.key_blocks.keys()
 
 		bpy.ops.object.shape_key_add(from_mix=True)
@@ -562,7 +612,7 @@ class Sculpt_OT_Apply_Shape_Keys(bpy.types.Operator):
 			if shape.name == ob.active_shape_key.name:
 				shape.name = "Applied Shape"
 				shape.value = 1.0
-				shape.keyframe_insert("value", frame=ob.active_shape_key_index)
+				# shape.keyframe_insert("value", frame=ob.active_shape_key_index)
 			else:
 				shape_list.append(shape)
 
