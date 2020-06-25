@@ -7,3 +7,5 @@ A blender addon for sculpting with shape keys as layers.
 
 ![TMG_Shape_Layers_Panel pic1](Previews/01.png)
 
+![TMG_Shape_Layers_Panel pic2](Previews/02.png)
+
