@@ -3,6 +3,10 @@ A blender addon for sculpting with shape keys as layers.
 
 ![Current Release: 0.2.5](https://github.com/Mainman002/TMG-Shape-Layers-Panel/releases/tag/0.2.5)
 
+If you'd like to donate you can "purchase" my addon from Gumroad :) 
+
+https://gum.co/zDFJZh
+
 #### current version is supported for Blender 2.83, and 2.92
 
 ![TMG_Shape_Layers_Panel pic1](Previews/01.png)
