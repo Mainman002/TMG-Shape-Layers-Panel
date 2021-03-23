@@ -12,8 +12,8 @@ bl_info = {
     "author": "Johnathan Mueller",
     "descrtion": "Sculpt using shape keys as layers.",
     "blender": (2, 80, 0),
-    "version": (0, 2, 4),
-    "location": "View3D (EditMode) > Sidebar > Edit Tab",
+    "version": (0, 2, 5),
+    "location": "View3D (SculptMode) > Sidebar > TMG Tab",
     "warning": "",
     "category": "Sculpt"
 }
@@ -28,6 +28,12 @@ bpy.types.Scene.shape_settings_menu = BoolProperty(name="Shape Key Settings",
 bpy.types.Scene.sculpt_shape_keys_icon_view = BoolProperty(name="Icon View",
                                                            default=False,
                                                            description="Switches the shape key panel from labeled buttons, to icons."
+                                                           )
+
+#### Sculpt Shape Keys Value Mode Switch #########################
+bpy.types.Scene.sculpt_shape_keys_value_view = BoolProperty(name="Value View",
+                                                           default=False,
+                                                           description="Switches the shape key input value from float text, to slider."
                                                            )
 
 

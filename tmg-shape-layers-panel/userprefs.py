@@ -13,6 +13,12 @@ class TMG_User_Preferences(AddonPreferences):
         default=False
     )
 
+    Layer_Value_Mode: bpy.props.BoolProperty(
+        name="Layer Value Mode",
+        description="Choose if the sculpt layers input value is a text label or sliders.",
+        default=False
+    )
+
     Sculpt_Keyframe_Timeline: bpy.props.BoolProperty(
         name="Keyframe Layers",
         description="Keyframes timeline when you add a shape layer.",
@@ -32,6 +38,7 @@ class TMG_User_Preferences(AddonPreferences):
 
     def draw(self, context):
         self.layout.prop(self, "Sculpt_Button_Mode")
+        self.layout.prop(self, "Layer_Value_Mode")
         # self.layout.prop(self, "Sculpt_Keyframe_Timeline")
         self.layout.prop(self, "shape_settings_menu")
 
@@ -49,6 +56,7 @@ def register():
 
     # Sculpt Panel Variables
     bpy.types.Scene.sculpt_shape_keys_icon_view = self.Sculpt_Button_Mode
+    bpy.types.Scene.sculpt_shape_keys_value_view = self.Layer_Value_Mode
     bpy.types.Scene.keyframe_timeline = self.Sculpt_Keyframe_Timeline
     bpy.types.Scene.shape_settings_menu = self.shape_settings_menu
 

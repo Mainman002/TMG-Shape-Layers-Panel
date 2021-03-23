@@ -17,33 +17,43 @@ def sculpt_single_shape_layer_changed(self, context):
 		else:
 			shape.mute = sculpt_single_shape_layer
 
-
-
-
 class MESH_UL_custom_shape_keys(UIList):
 	def draw_item(self, _context, layout, _data, item, icon, active_data, _active_propname, index, _hide_all):
+
+		preferences = bpy.context.preferences
+		addon_prefs = preferences.addons['tmg-shape-layers-panel'].preferences
+		tmg_prefs = bpy.context.preferences.addons['tmg-shape-layers-panel'].preferences
+
 		# assert(isinstance(item, bpy.types.ShapeKey))
 		obj = active_data
 		# key = data
 		key_block = item
 		if self.layout_type in {'DEFAULT', 'COMPACT'}:
-			split = layout.split(factor=0.50, align=False)
-			split.prop(key_block, "name", text="", emboss=False, icon_value=icon)
+			split = layout.split(factor=0.3, align=True)
+			split.alignment = 'LEFT'
+			split.prop(key_block, "name", text="", emboss=False)
+
 			row = split.row(align=True)
+			row.alignment = 'RIGHT'
+
+			split_row = row.row(align=True)
+			split_row.alignment = 'RIGHT'
+
 			if key_block.mute or (obj.mode == 'EDIT' and not (obj.use_shape_key_edit_mode and obj.type == 'MESH')):
-				row.active = False
+				split.active = False
 			if not item.id_data.use_relative:
-				row.prop(key_block, "frame", text="", emboss=False)
+				split_row.prop(key_block, "frame", text="", emboss=False)
 			elif index > 0:
-				row.prop(key_block, "value", text="", emboss=False)
-				row.prop(key_block, "mute", text="", emboss=False)
+				split_row.prop(key_block, "value", text="", emboss=tmg_prefs.Layer_Value_Mode)
+				split_row.prop(key_block, "mute", text="", emboss=False)
 			else:
-				row.label(text="")
+				split_row.label(text="")
 			# row.prop(key_block, "mute", text="", emboss=False)
-			props = row.operator('mesh.sculpt_ot_shape_key_hide_others', text='', icon='RESTRICT_RENDER_OFF', emboss=False)
+			props = split_row.operator('mesh.sculpt_ot_shape_key_hide_others', text='', icon='RESTRICT_RENDER_OFF', emboss=False)
 			props.id = index
 		elif self.layout_type == 'GRID':
-			layout.alignment = 'CENTER'
+			layout.alignment = 'RIGHT'
+			# layout.alignment = 'CENTER'
 			layout.label(text="", icon_value=icon)
 
 
@@ -177,8 +187,11 @@ class Sculpt_Shape_Layers_Panel(bpy.types.Panel):
 			row = col_3.row(align=True)
 			# row.prop(addon_prefs, "Sculpt_Keyframe_Timeline", text="Keyframe", icon='KEY_HLT')
 			
-			row.label(text='Preferences')
-			row.operator('mesh.sculpt_ot_show_tmg_addon_prefs',
+			row_right = row.row(align=False)
+			row_right.alignment = "RIGHT"
+
+			row_right.label(text='Preferences')
+			row_right.operator('mesh.sculpt_ot_show_tmg_addon_prefs',
 								text='',
 								icon='TOOL_SETTINGS')
 
