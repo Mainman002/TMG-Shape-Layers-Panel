@@ -66,16 +66,14 @@ class Sculpt_Shape_Layers_Panel(bpy.types.Panel):
 	bl_context = "sculpt_mode"
 	bl_space_type = 'VIEW_3D'
 	bl_region_type = 'UI'
-	COMPAT_ENGINES = {'BLENDER_RENDER', 'BLENDER_EEVEE', 'BLENDER_WORKBENCH'}
 
 	@classmethod
 	def poll(cls, context):
 		engine = context.engine
 		obj = context.active_object
-		return (obj and obj.type in {'MESH', 'LATTICE', 'CURVE', 'SURFACE'} and (engine in cls.COMPAT_ENGINES))
+		return (obj and obj.type in {'MESH', 'LATTICE', 'CURVE', 'SURFACE'})
 
 	def draw(self, context):
-
 		preferences = context.preferences
 		addon_prefs = preferences.addons['tmg-shape-layers-panel'].preferences
 		tmg_prefs = context.preferences.addons['tmg-shape-layers-panel'].preferences

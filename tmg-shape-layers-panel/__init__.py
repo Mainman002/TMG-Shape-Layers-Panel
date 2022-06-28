@@ -12,7 +12,7 @@ bl_info = {
     "author": "Johnathan Mueller",
     "descrtion": "Sculpt using shape keys as layers.",
     "blender": (2, 80, 0),
-    "version": (0, 2, 5),
+    "version": (0, 2, 6),
     "location": "View3D (SculptMode) > Sidebar > TMG Tab",
     "warning": "",
     "category": "Sculpt"
